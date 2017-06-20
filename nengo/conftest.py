@@ -50,6 +50,9 @@ class TestConfig(object):
 def pytest_configure(config):
     matplotlib.use('agg')
 
+    if config.getoption('seed'):
+        TestConfig.test_seed = config.getoption('seed')[0]
+
     if config.getoption('simulator'):
         TestConfig.Simulator = load_class(config.getoption('simulator')[0])
     if config.getoption('ref_simulator'):

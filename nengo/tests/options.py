@@ -1,4 +1,6 @@
 def pytest_addoption(parser):
+    parser.addoption('--seed', nargs=1, type=int, default=0,
+                     help="Specify the random number seed to use in tests.")
     parser.addoption('--simulator', nargs=1, type=str, default=None,
                      help='Specify simulator under test.')
     parser.addoption('--ref-simulator', nargs=1, type=str, default=None,
