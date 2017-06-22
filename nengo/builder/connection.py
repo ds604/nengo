@@ -255,13 +255,19 @@ def build_connection(model, conn):
     # Add operator for applying weights
     model.sig[conn]['weights'] = Signal(
         weights, name="%s.weights" % conn, readonly=True)
-    signal = Signal(np.zeros(signal_size), name="%s.weighted" % conn)
-    model.add_op(Reset(signal))
-    op = ElementwiseInc if weights.ndim < 2 else DotInc
-    model.add_op(op(model.sig[conn]['weights'],
-                    in_signal,
-                    signal,
-                    tag="%s.weights_elementwiseinc" % conn))
+
+    if np.array_equal(weights, 1.0):
+        # If just multiplying by 1.0 (the default transform) we omit the
+        # multiplication to save computation
+        signal = in_signal
+    else:
+        signal = Signal(np.zeros(signal_size), name="%s.weighted" % conn)
+        model.add_op(Reset(signal))
+        op = ElementwiseInc if weights.ndim < 2 else DotInc
+        model.add_op(op(model.sig[conn]['weights'],
+                        in_signal,
+                        signal,
+                        tag="%s.weights_elementwiseinc" % conn))
 
     # Add operator for filtering
     if conn.synapse is not None:
